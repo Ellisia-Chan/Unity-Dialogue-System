@@ -8,9 +8,14 @@ public class PlayerController : MonoBehaviour {
 
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private LayerMask groundLayerMask;
+    [SerializeField] private Transform groundCheck;
+    [SerializeField] private float groundCheckRadius = 0.2f;
 
     private Rigidbody2D rb;
     private Vector2 movement;
+    private bool isGrounded;
+    private bool isJumping;
 
     private void Awake() {
         Instance = this;
@@ -19,19 +24,29 @@ public class PlayerController : MonoBehaviour {
 
     private void Start() {
         GameInput.Instance.OnJumpAction += GameInput_OnJumpAction;
+        GameInput.Instance.OnJumpCanceled += GameInput_OnJumpCanceled;
     }
 
     // EVENT Listeners
     private void GameInput_OnJumpAction(object sender, System.EventArgs e) {
-        HandleJump();
+        isJumping = true;
+    }
+
+    private void GameInput_OnJumpCanceled(object sender, System.EventArgs e) {
+        isJumping = false;
     }
 
     private void Update() {
         HandleMovementInput();
+        CheckGround();
     }
 
     private void FixedUpdate() {
         HandleMovement();
+
+        if (isJumping && isGrounded) {
+            HandleJump();
+        }
     }
 
     private void HandleMovementInput() {
@@ -39,10 +54,18 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void HandleMovement() {
-        rb.velocity = new Vector2(movement.x * moveSpeed, rb.velocity.y);
+        if (isGrounded || movement.x != 0) {
+            rb.velocity = new Vector2(movement.x * moveSpeed, rb.velocity.y);
+        }
     }
 
     private void HandleJump() {
-        rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        if (isGrounded) {
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+        }
+    }
+
+    private void CheckGround() {
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundLayerMask);
     }
 }

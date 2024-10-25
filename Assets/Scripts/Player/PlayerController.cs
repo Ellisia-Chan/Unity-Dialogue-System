@@ -18,7 +18,12 @@ public class PlayerController : MonoBehaviour {
     private bool isJumping;
 
     private void Awake() {
-        Instance = this;
+        if (Instance != null && Instance != this) {
+            Destroy(gameObject);
+        } else {
+            Instance = this;
+        }
+
         rb = GetComponent<Rigidbody2D>();
     }
 
@@ -42,10 +47,12 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void FixedUpdate() {
-        HandleMovement();
+        if (!DialogueManager.Instance.IsDialoguePlaying()) {
+            HandleMovement();
 
-        if (isJumping && isGrounded) {
-            HandleJump();
+            if (isJumping && isGrounded) {
+                HandleJump();
+            }
         }
     }
 

@@ -5,3 +5,7 @@ This repository contains a practice project focused on implementing a dialogue s
 ## Features
 
 - **Interactive Dialogue**: Dialogue triggered by player interaction with NPCs.
+
+
+## Preview
+![image](https://github.com/user-attachments/assets/7030ebbf-c669-4fdd-b619-c00eee42e7c8)

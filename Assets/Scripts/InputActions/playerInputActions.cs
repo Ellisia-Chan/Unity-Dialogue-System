@@ -132,6 +132,126 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""UI Navigation"",
+            ""id"": ""a0908336-fc96-479d-819b-d3785135f1cb"",
+            ""actions"": [
+                {
+                    ""name"": ""Navigate"",
+                    ""type"": ""Value"",
+                    ""id"": ""b711039e-b6ac-40ad-95c6-9ccb35df843e"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": ""2D Vector"",
+                    ""id"": ""cc1bf045-0aa2-4554-a8e7-ed979e032968"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""a318f86e-b0b4-4050-b847-7c2700354a12"",
+                    ""path"": ""<Keyboard>/upArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""32a8cffb-5af3-4ab7-963f-d030fc3e49a2"",
+                    ""path"": ""<Keyboard>/downArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""0b0fa44f-52a3-4d5e-82f0-84530369135e"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""4d6a88c3-8945-409f-8e93-035134bcfb97"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                }
+            ]
+        },
+        {
+            ""name"": ""Mouse"",
+            ""id"": ""2922b208-0c73-4afe-8b23-3d2b87d5c00d"",
+            ""actions"": [
+                {
+                    ""name"": ""Left Click"",
+                    ""type"": ""Button"",
+                    ""id"": ""93ca7f80-e767-4f74-8541-5dce8831b26c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Pointer"",
+                    ""type"": ""Value"",
+                    ""id"": ""eb9dbdb8-6332-4ab4-b916-f00699dfa5b6"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""d856734b-5792-4a05-b8d3-7a1b1050ae5f"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Left Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""59e0e8ec-cfb5-436e-a8b1-a51886eb9375"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pointer"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": []
@@ -142,6 +262,13 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         m_Player_Jump = m_Player.FindAction("Jump", throwIfNotFound: true);
         m_Player_Interact = m_Player.FindAction("Interact", throwIfNotFound: true);
         m_Player_Continue = m_Player.FindAction("Continue", throwIfNotFound: true);
+        // UI Navigation
+        m_UINavigation = asset.FindActionMap("UI Navigation", throwIfNotFound: true);
+        m_UINavigation_Navigate = m_UINavigation.FindAction("Navigate", throwIfNotFound: true);
+        // Mouse
+        m_Mouse = asset.FindActionMap("Mouse", throwIfNotFound: true);
+        m_Mouse_LeftClick = m_Mouse.FindAction("Left Click", throwIfNotFound: true);
+        m_Mouse_Pointer = m_Mouse.FindAction("Pointer", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -269,11 +396,120 @@ public partial class @PlayerInputActions: IInputActionCollection2, IDisposable
         }
     }
     public PlayerActions @Player => new PlayerActions(this);
+
+    // UI Navigation
+    private readonly InputActionMap m_UINavigation;
+    private List<IUINavigationActions> m_UINavigationActionsCallbackInterfaces = new List<IUINavigationActions>();
+    private readonly InputAction m_UINavigation_Navigate;
+    public struct UINavigationActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public UINavigationActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Navigate => m_Wrapper.m_UINavigation_Navigate;
+        public InputActionMap Get() { return m_Wrapper.m_UINavigation; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(UINavigationActions set) { return set.Get(); }
+        public void AddCallbacks(IUINavigationActions instance)
+        {
+            if (instance == null || m_Wrapper.m_UINavigationActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_UINavigationActionsCallbackInterfaces.Add(instance);
+            @Navigate.started += instance.OnNavigate;
+            @Navigate.performed += instance.OnNavigate;
+            @Navigate.canceled += instance.OnNavigate;
+        }
+
+        private void UnregisterCallbacks(IUINavigationActions instance)
+        {
+            @Navigate.started -= instance.OnNavigate;
+            @Navigate.performed -= instance.OnNavigate;
+            @Navigate.canceled -= instance.OnNavigate;
+        }
+
+        public void RemoveCallbacks(IUINavigationActions instance)
+        {
+            if (m_Wrapper.m_UINavigationActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IUINavigationActions instance)
+        {
+            foreach (var item in m_Wrapper.m_UINavigationActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_UINavigationActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public UINavigationActions @UINavigation => new UINavigationActions(this);
+
+    // Mouse
+    private readonly InputActionMap m_Mouse;
+    private List<IMouseActions> m_MouseActionsCallbackInterfaces = new List<IMouseActions>();
+    private readonly InputAction m_Mouse_LeftClick;
+    private readonly InputAction m_Mouse_Pointer;
+    public struct MouseActions
+    {
+        private @PlayerInputActions m_Wrapper;
+        public MouseActions(@PlayerInputActions wrapper) { m_Wrapper = wrapper; }
+        public InputAction @LeftClick => m_Wrapper.m_Mouse_LeftClick;
+        public InputAction @Pointer => m_Wrapper.m_Mouse_Pointer;
+        public InputActionMap Get() { return m_Wrapper.m_Mouse; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(MouseActions set) { return set.Get(); }
+        public void AddCallbacks(IMouseActions instance)
+        {
+            if (instance == null || m_Wrapper.m_MouseActionsCallbackInterfaces.Contains(instance)) return;
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Add(instance);
+            @LeftClick.started += instance.OnLeftClick;
+            @LeftClick.performed += instance.OnLeftClick;
+            @LeftClick.canceled += instance.OnLeftClick;
+            @Pointer.started += instance.OnPointer;
+            @Pointer.performed += instance.OnPointer;
+            @Pointer.canceled += instance.OnPointer;
+        }
+
+        private void UnregisterCallbacks(IMouseActions instance)
+        {
+            @LeftClick.started -= instance.OnLeftClick;
+            @LeftClick.performed -= instance.OnLeftClick;
+            @LeftClick.canceled -= instance.OnLeftClick;
+            @Pointer.started -= instance.OnPointer;
+            @Pointer.performed -= instance.OnPointer;
+            @Pointer.canceled -= instance.OnPointer;
+        }
+
+        public void RemoveCallbacks(IMouseActions instance)
+        {
+            if (m_Wrapper.m_MouseActionsCallbackInterfaces.Remove(instance))
+                UnregisterCallbacks(instance);
+        }
+
+        public void SetCallbacks(IMouseActions instance)
+        {
+            foreach (var item in m_Wrapper.m_MouseActionsCallbackInterfaces)
+                UnregisterCallbacks(item);
+            m_Wrapper.m_MouseActionsCallbackInterfaces.Clear();
+            AddCallbacks(instance);
+        }
+    }
+    public MouseActions @Mouse => new MouseActions(this);
     public interface IPlayerActions
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnInteract(InputAction.CallbackContext context);
         void OnContinue(InputAction.CallbackContext context);
+    }
+    public interface IUINavigationActions
+    {
+        void OnNavigate(InputAction.CallbackContext context);
+    }
+    public interface IMouseActions
+    {
+        void OnLeftClick(InputAction.CallbackContext context);
+        void OnPointer(InputAction.CallbackContext context);
     }
 }
